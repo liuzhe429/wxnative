@@ -18,6 +18,7 @@ import HomeScreen from './containers/Home/HomeScreen'
 import FoundScreen from './containers/Found/FoundScreen'
 import MyScreen from './containers/My/MyScreen'
 import DealListScreen from './containers/DealList/DealListScreen'
+import SxyListScreen from './containers/SxyList/SxyListScreen'
 import DealDetailScreen from './containers/DealDetail/DealDetailScreen'
 import SxyDetailScreen from './containers/SxyDetail/SxyDetailScreen'
 import DealConfirmScreen from './containers/DealConfirm/DealConfirmScreen'
@@ -121,6 +122,9 @@ const  MyNavigatior = StackNavigator({
       //             </TouchableOpacity>
       //           </View>
       }
+    },
+    SxyList:{
+      screen:SxyListScreen,
     },
     DealDetail:{screen:DealDetailScreen},
     SxyDetail:{screen:SxyDetailScreen},

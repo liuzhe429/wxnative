@@ -48,8 +48,13 @@ class HomeScreen extends Component {
               </View>
               <View style={{width:"50%",flex:1,flexDirection:"row",justifyContent:"flex-end",alignItems:"center"}}>
                 <TouchableOpacity activeOpacity={1} style={{width:"40%",height:50,flexDirection:"row",justifyContent:"flex-end",alignItems:"center"}}>
-                  <Text style={{fontSize:13,color:"#909090"}}
-                        onPress={() => navigate('DealList', { title: info.section.key,key:keyType })}>更多</Text>
+                  {
+                    info.section.key == "专享"
+                    ? <Text style={{fontSize:13,color:"#909090"}}
+                        onPress={() => navigate('DealList', { title: "专享",key:"zx" })}>更多1</Text>
+                    : <Text style={{fontSize:13,color:"#909090"}}
+                        onPress={() => navigate('SxyList', { title: "随鑫约",key:"sxy" })}>更多2</Text>
+                  }
                   <Text style={styles.arrow}>
                     <Image
                       source={require('./images/arrows_reserve.png')}
@@ -100,10 +105,10 @@ class HomeScreen extends Component {
     const { navigate } = this.props.navigation
     var sections = [{
       key:"随鑫约",
-      data: this.state.sxydatas
+      data: this.props.sxydatas
     },{
       key:"专享",
-      data: this.state.zxdatas
+      data: this.props.zxdatas
     }]
     return (
       <View>
