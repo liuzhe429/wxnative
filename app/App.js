@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   Image,Navigatorw
 } from 'react-native'
+import { Provider } from 'react-redux'
+//redux数据
+import store from './store'
 import {
   StackNavigator,
   TabNavigator
@@ -18,8 +21,9 @@ import DealListScreen from './containers/DealList/DealListScreen'
 import DealDetailScreen from './containers/DealDetail/DealDetailScreen'
 import SxyDetailScreen from './containers/SxyDetail/SxyDetailScreen'
 import DealConfirmScreen from './containers/DealConfirm/DealConfirmScreen'
+global.store = store.getState()
 // 通过TabNavigator做路由映射
-const MainScreentNavigator=TabNavigator({
+const MainScreentNavigator = TabNavigator({
   Home:{
     screen:HomeScreen,
     navigationOptions:{
@@ -122,6 +126,17 @@ const  MyNavigatior = StackNavigator({
     SxyDetail:{screen:SxyDetailScreen},
     DealConfirm:{screen:DealConfirmScreen}
 })
+class App extends Component{
+  
+  render(){
+    console.log(store.getState())
+
+    return <Provider store={store}>
+              <MyNavigatior/>
+           </Provider>
+  }
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -139,4 +154,4 @@ const styles = StyleSheet.create({
     marginRight:0,
   }
 })
-AppRegistry.registerComponent('wangxinnative', () => MyNavigatior);
+AppRegistry.registerComponent('wangxinnative', () => App);

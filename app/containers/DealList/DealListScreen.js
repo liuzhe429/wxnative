@@ -23,7 +23,7 @@ export default class DealListScreen extends Component {
       navigate : this.props.navigation.navigate,
       data :[]
     }
-    console.log(this.props.navigation.state.params.title,"navigation.state.params.title")
+    // console.log(this.props.navigation.state.params.title,"navigation.state.params.title")
   }
   componentWillMount(){
     let params = this.props.navigation.state.params

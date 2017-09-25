@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { AppRegistry,StyleSheet,Text,View,TouchableOpacity,Image,ScrollView,SectionList,ListView, } from 'react-native'
 import Swiper from 'react-native-swiper'
@@ -7,27 +8,29 @@ let ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
 import DashLine from "../../components/common/DashLine"
 import InvestItem from "../../components/InvestItem"
-// import ViewPager from 'react-native-viewpager'
+import ViewPager from 'react-native-viewpager'
+import{getZxDatas,getSxyDatas} from "./homeReducer.js"
 const BANNER_IMGS = [
   require('./images/banner/11.jpg'),
   require('./images/banner/22.jpg'),
   require('./images/banner/3.jpg'),
   require('./images/banner/4.jpg')
-];
-export default class HomeScreen extends Component {
+]
+
+class HomeScreen extends Component {
   constructor(props) {
     super(props)
     // 用于构建DataSource对象
-    // var dataSource = new ViewPager.DataSource({
-    //     pageHasChanged: (p1, p2) => p1 !== p2,
-    // });
-    // var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    var dataSource = new ViewPager.DataSource({
+        pageHasChanged: (p1, p2) => p1 !== p2,
+    });
+    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     // 实际的DataSources存放在state中
     this.state = {
-        // dataSource: dataSource.cloneWithPages(BANNER_IMGS),
-        // listData: ds,
-        sxydatas:[],
-        zxdatas:[]
+        dataSource: dataSource.cloneWithPages(BANNER_IMGS),
+        listData: ds,
+        sxydatas:this.props.sxydatas || [],
+        zxdatas:this.props.zxdatas || []
 
     }
   }
@@ -66,112 +69,41 @@ export default class HomeScreen extends Component {
     return <View style={{height:60}}></View>
   }
   componentWillMount() {
-    console.log("34444")
-    // fetch("http://10.20.69.187:3030/api/deal/reserveConf")
-    //   .then((res)=>res.json())
-    //   .then((str)=>{
-    //     console.log("str",str.data.list)
-    //     this.setState({
-    //       sxydatas:str.data.list
-    //     })
-    //   })
-    // fetch("http://10.20.69.187:3030/api/index/zxP2pindex?dealListType=zx&page=1")
-    //   .then((res)=>res.json())
-    //   .then((str)=>{
-    //     console.log("str",str.data)
-    //     this.setState({
-    //       zxdatas:str.data
-    //     })
-    //   })
+    const {dispatch} = this.props
+    let url ="http://10.20.69.46:3030/api/deal/reserveConf"
+    // let url = "https://mo.wangxinlicai.com/api/deal/reserveConf"
+    fetch(url,{
+      method:"GET",
+      mode:"cors"
+    }).then((res)=>res.json())
+      .then((datas)=>{
+        dispatch(getSxyDatas(datas.data.list.slice(0,2)))
+        this.setState({
+          sxydatas:this.props.sxydatas
+        })
+      })
+    fetch("http://10.20.69.46:3030/api/index/zxP2pindex?dealListType=zx&page=1")
+      .then((res)=>res.json())
+      .then((datas)=>{
+        dispatch(getZxDatas(datas.data.slice(0,2)))
+        this.setState({
+          zxdatas:this.props.zxdatas
+        })
+      })
+  }
+  componentDidMount(){
+    setTimeout(()=>{
+      console.log(this.props,"props")
+    },3000)
   }
   render() {
     const { navigate } = this.props.navigation
-    let sxydatas = [{
-      "investLine": "36",
-      "unitType": "2",
-      "investUnit": "个月",
-      "buttonName": "去预约",
-      "tagBefore": "预计9月19日起息",
-      "tagAfter": "",
-      "displayMoney": 1,
-      "countDisplay": 0,
-      "count": "100.00元起投",
-      "amount": "27,025.34万元",
-      "rate": "12.50%",
-      "dealType": 0,
-      "appointUrl": "/deal/reserve?investLine=36&investUnit=2",
-      "detailUrl": "/deal/reservedetail?line_unit=36_2",
-      "rateText": "年化借款利率"
-    },{
-      "investLine": "21",
-      "unitType": "1",
-      "investUnit": "天",
-      "buttonName": "去预约",
-      "tagBefore": "投资即返1.5%红包",
-      "tagAfter": "预计9月19日起息",
-      "displayMoney": 1,
-      "countDisplay": 0,
-      "count": "100.00元起投",
-      "amount": "597,687.18万元",
-      "rate": "5.30%",
-      "dealType": 0,
-      "appointUrl": "/deal/reserve?investLine=21&investUnit=1",
-      "detailUrl": "/deal/reservedetail?line_unit=21_1",
-      "rateText": "年化借款利率"
-    }]
-    let zxdatas=[{
-      "productID": "kCwk",
-      "type": "资产管理",
-      "title": "盈嘉A003327615",
-      "timelimit": "6",
-      "total": "2,500.00万",
-      "avaliable": "23,270,839.68",
-      "mini": "12.10万",
-      "repayment": "按月支付收益到期还本",
-      "loantype": "4",
-      "stats": "1",
-      "crowd_str": "全部用户",
-      "deal_crowd": "0",
-      "start_loan_time": "",
-      "income_base_rate": "8.40",
-      "income_ext_rate": 0,
-      "rate": "8.40",
-      "money_loan": "23270839.68",
-      "daren": 0,
-      "deal_tag_name": "果粉标＋高净值尊享＋满标有礼",
-      "deal_type": 0,
-      "product_name": "友居贷3号-1",
-      "timeunit": "个月"
-    },{
-      "productID": "kCuE",
-      "type": "资产管理",
-      "title": "盈嘉A003327253",
-      "timelimit": "12",
-      "total": "3,255.00万",
-      "avaliable": "18,656,875.18",
-      "mini": "11.00万",
-      "repayment": "按月支付收益到期还本",
-      "loantype": "4",
-      "stats": "1",
-      "crowd_str": "全部用户",
-      "deal_crowd": "0",
-      "start_loan_time": "",
-      "income_base_rate": "9.30",
-      "income_ext_rate": 0,
-      "rate": "9.30",
-      "money_loan": "18656875.18",
-      "daren": 0,
-      "deal_tag_name": "高净值客户尊享+满标有礼",
-      "deal_type": 0,
-      "product_name": "长兴8号-1",
-      "timeunit": "个月"
-    }]
     var sections = [{
       key:"随鑫约",
-      data: sxydatas
+      data: this.state.sxydatas
     },{
       key:"专享",
-      data: zxdatas
+      data: this.state.zxdatas
     }]
     return (
       <View>
@@ -202,6 +134,7 @@ export default class HomeScreen extends Component {
           <View>
             <SectionList
               sections={sections}
+              getItemCount={2}
               keyExtractor = {this._extraUniqueKey}
               SectionSeparatorComponent={this._renderSectionHeader2}
               ListFooterComponent={this._ListFooterComponent}
@@ -241,3 +174,10 @@ const styles = StyleSheet.create({
     marginRight:0,
   }
 })
+const mapStateToProps = (state) => {
+  let { homeReducer } = state;
+  return homeReducer
+}
+
+export default connect(mapStateToProps)(HomeScreen)
+// export default HomeScreen
