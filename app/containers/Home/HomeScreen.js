@@ -3,9 +3,6 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { AppRegistry,StyleSheet,Text,View,TouchableOpacity,Image,ScrollView,SectionList,ListView, } from 'react-native'
 import Swiper from 'react-native-swiper'
-import  Dimensions from 'Dimensions'//获取屏幕的宽高
-let ScreenWidth = Dimensions.get('window').width
-var ScreenHeight = Dimensions.get('window').height
 import DashLine from "../../components/common/DashLine"
 import InvestItem from "../../components/InvestItem"
 import{getZxDatas,getSxyDatas,clearZxDatas,clearSxyDatas} from "./homeReducer.js"

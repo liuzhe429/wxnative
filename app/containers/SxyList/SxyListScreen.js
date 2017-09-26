@@ -34,56 +34,53 @@ class SxyListScreen extends Component {
       errorInfo: "",
       dataArray : this.props.sxyListdatas || []
     }
-    // console.log(this.props.navigation.state.params.title,"navigation.state.params.title")
   }
   componentWillMount(){
-    let url ="http://10.20.69.46:3030/api/deal/reserveConf"
-    // let url = "https://mo.wangxinlicai.com/api/deal/reserveConf"
-    const {dispatch} = this.props
-    // let url = "https://mo.wangxinlicai.com/api/deal/reserveConf"
-    console.log(this.props.sxyListdatas.length,"提前判断")
-    if(this.props.sxyListdatas.length>0) return
-    fetch(url,()=>{
+    console.log("加载")
+    if(this.props.sxyListdatas.length>0){
+      this.setState({
+        isLoading: false
+      })
+    }else{
+      this.loadData()
+    }
+  }
+  loadData(){
+
+    const {dispatch} = this.props    
+    fetch(global.originTarget+"/api/deal/reserveConf",()=>{
       dispatch(clearSxyDatas())
     })
     .then((res)=>res.json())
     .then((datas)=>{
       dispatch(getSxyListDatas(datas.data.list))
       this.setState({
-        //复制数据源
-        dataArray: this.props.sxyListdatas,
         isLoading: false,
-      })
-      setTimeout(()=>{
-        console.log(this.props.sxyListdatas,"sxydatas")
-      },1000)
-    })
-    .catch((error)=>{
-      this.setState({
-        error: true,
-        errorInfo: error
       })
     })
     .done()
   }
-
+  _onload(){
+    if(this.props.zxlistdatas.length>0){
+      this.setState({
+        isLoading: false
+      })
+    }else{
+      this.loadData()
+    }
+  }
   // 点击返回上一页方法
   backVC=()=>{
     //返回首页方法
     this.props.navigation.goBack()
   }
   refreshing(){
-    let timer = setTimeout(()=>{
-                    clearTimeout(timer)
-                    console.log('刷新成功')
-                },1500)
+    console.log("zheli 刷新")
+    const { dispatch } = this.props
+    dispatch(clearSxyListDatas())
+    this.loadData()
   }
-  _onload(){
-      let timer = setTimeout(()=>{
-                      clearTimeout(timer)
-                      console.log('加载成功')
-                  },1500)
-  }
+
   _extraUniqueKey(item ,index){
     return "index"+index+item
   }
@@ -114,13 +111,16 @@ class SxyListScreen extends Component {
   }
   renderData(){
     return (
-      <ScrollView >
-          <AnimatedFlatList
-              data={this.state.dataArray}
-              keyExtractor = {this._extraUniqueKey}
-              renderItem={this._renderItem}
-          />
-      </ScrollView>
+          <ScrollView>
+            <FlatList
+                data={this.props.sxyListdatas}
+                keyExtractor = {this._extraUniqueKey}
+                renderItem={this._renderItem}
+                ItemSeparatorComponent={this._separator}
+                onRefresh={this.refreshing.bind(this)}
+                refreshing={this.state.isLoading}
+            />
+          </ScrollView>
     )
   }
   // 应该不需要

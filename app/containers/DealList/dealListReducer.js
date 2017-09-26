@@ -1,24 +1,38 @@
 //action
-export const GET_ZX_DATAS = 'GET_ZX_DATAS'
-export function getZxListDatas(zxdatas) {
+export const GET_ZXLIST_DATAS = 'GET_ZXLIST_DATAS'
+export const CLEAR_ZXLIST_DATAS = 'CLEAR_ZXLIST_DATAS'
+export function getZxListDatas(zxlistdatas,zxlistpage=1) {
   return {
-    type: GET_ZX_DATAS,
-    zxdatas
+    type: GET_ZXLIST_DATAS,
+    zxlistdatas,
+    zxlistpage
   }
 }
-
+export function clearZxListDatas(){
+  return {
+    type : CLEAR_ZXLIST_DATAS
+  }
+}
 let initDatas = {
-  zxdatas:[]
+  zxlistdatas:[],
+  zxlistpage:1
 }
 export default(state, action) => {
   if (!state) {
     return initDatas
   }
   switch (action.type) {
-    case GET_ZX_DATAS:
+    case GET_ZXLIST_DATAS:
       return {
         ...state,
-        sxydatas: state.zxdatas.concat(action.zxdatas)
+        zxlistdatas: state.zxlistdatas.concat(action.zxlistdatas),
+        zxlistpage: action.zxlistpage
+      }
+    case CLEAR_ZXLIST_DATAS:
+      return {
+        ...state,
+        zxlistdatas:[],
+        zxlistpage:1
       }
     default:
       return state
