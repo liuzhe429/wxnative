@@ -8,30 +8,14 @@ let ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
 import DashLine from "../../components/common/DashLine"
 import InvestItem from "../../components/InvestItem"
-import ViewPager from 'react-native-viewpager'
-import{getZxDatas,getSxyDatas} from "./homeReducer.js"
-const BANNER_IMGS = [
-  require('./images/banner/11.jpg'),
-  require('./images/banner/22.jpg'),
-  require('./images/banner/3.jpg'),
-  require('./images/banner/4.jpg')
-]
+import{getZxDatas,getSxyDatas,clearZxDatas,clearSxyDatas} from "./homeReducer.js"
 
 class HomeScreen extends Component {
   constructor(props) {
     super(props)
-    // 用于构建DataSource对象
-    var dataSource = new ViewPager.DataSource({
-        pageHasChanged: (p1, p2) => p1 !== p2,
-    });
-    var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    // 实际的DataSources存放在state中
     this.state = {
-        dataSource: dataSource.cloneWithPages(BANNER_IMGS),
-        listData: ds,
         sxydatas:this.props.sxydatas || [],
         zxdatas:this.props.zxdatas || []
-
     }
   }
   _renderItem = (info) => {
@@ -51,9 +35,9 @@ class HomeScreen extends Component {
                   {
                     info.section.key == "专享"
                     ? <Text style={{fontSize:13,color:"#909090"}}
-                        onPress={() => navigate('DealList', { title: "专享",key:"zx" })}>更多1</Text>
+                        onPress={() => navigate('DealList', { title: "专享",key:"zx" })}>更多</Text>
                     : <Text style={{fontSize:13,color:"#909090"}}
-                        onPress={() => navigate('SxyList', { title: "随鑫约",key:"sxy" })}>更多2</Text>
+                        onPress={() => navigate('SxyList', { title: "随鑫约",key:"sxy" })}>更多</Text>
                   }
                   <Text style={styles.arrow}>
                     <Image
@@ -75,31 +59,26 @@ class HomeScreen extends Component {
   }
   componentWillMount() {
     const {dispatch} = this.props
-    let url ="http://10.20.69.46:3030/api/deal/reserveConf"
-    // let url = "https://mo.wangxinlicai.com/api/deal/reserveConf"
-    fetch(url,{
-      method:"GET",
-      mode:"cors"
+    let url = global.originTarget+"/api/deal/reserveConf"
+    if(this.props.sxydatas.length<0){
+      
+    }
+    fetch(url,()=>{
+      dispatch(clearSxyDatas())
     }).then((res)=>res.json())
       .then((datas)=>{
         dispatch(getSxyDatas(datas.data.list.slice(0,2)))
-        this.setState({
-          sxydatas:this.props.sxydatas
-        })
       })
-    fetch("http://10.20.69.46:3030/api/index/zxP2pindex?dealListType=zx&page=1")
-      .then((res)=>res.json())
-      .then((datas)=>{
-        dispatch(getZxDatas(datas.data.slice(0,2)))
-        this.setState({
-          zxdatas:this.props.zxdatas
-        })
-      })
-  }
-  componentDidMount(){
-    setTimeout(()=>{
-      console.log(this.props,"props")
-    },3000)
+    if(this.props.zxdatas.length<0){
+      
+    }
+    fetch(global.originTarget+"/api/index/zxP2pindex?dealListType=zx&page=1",()=>{
+      dispatch(clearZxDatas())
+    }).then((res)=>res.json())
+    .then((datas)=>{
+      dispatch(getZxDatas(datas.data.slice(0,2)))
+    })
+    
   }
   render() {
     const { navigate } = this.props.navigation
@@ -185,4 +164,3 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps)(HomeScreen)
-// export default HomeScreen

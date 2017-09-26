@@ -9,7 +9,6 @@ import {
   FlatList,
   Animated,
   ActivityIndicator,
-  ScrollView
 } from 'react-native'
 import  Dimensions from 'Dimensions'//获取屏幕的宽高
 let ScreenWidth = Dimensions.get('window').width
@@ -93,8 +92,9 @@ class SxyListScreen extends Component {
         <View>
             <ActivityIndicator
                 animating={true}
-                style={[ {height: 80}]}
-                size="small"
+                style={[styles.gray, {height: 80}]}
+                color='red'
+                size="large"
             />
         </View>
     )
@@ -115,10 +115,12 @@ class SxyListScreen extends Component {
   renderData(){
     return (
       <ScrollView >
+          <Text >
+              Data:
+          </Text>
           <AnimatedFlatList
               data={this.state.dataArray}
-              keyExtractor = {this._extraUniqueKey}
-              renderItem={this._renderItem}
+              renderItem={this.renderItemView}
           />
       </ScrollView>
     )
@@ -139,15 +141,29 @@ class SxyListScreen extends Component {
   }
   render() {
     const { navigate } = this.props.navigation
-    //第一次加载等待的view
-    if (this.state.isLoading && !this.state.error) {
-      return this.renderLoadingView()
-    } else if (this.state.error) {
-        //请求失败view
-        return this.renderErrorView(this.state.errorInfo);
-    }
-    //加载数据
-    return this.renderData()
+    return (
+        <View >
+          <FlatList
+            data={this.state.dataArray}
+            keyExtractor = {this._extraUniqueKey}
+            ref={(flatList)=>this._flatList = flatList}
+            ListHeaderComponent={this._header}
+            ListFooterComponent={this._footer}
+            ItemSeparatorComponent={this._separator}
+            renderItem={this._renderItem}
+            onRefresh={this.refreshing}
+            refreshing={false}
+            onEndReachedThreshold={0}
+            onEndReached={
+                this._onload
+            }
+            numColumns ={1}
+            getItemLayout={(data,index)=>(
+              {length: 100, offset: (100+2) * index, index}
+            )}
+          />
+        </View>
+    )
   }
 }
 const mapStateToProps = (state) => {

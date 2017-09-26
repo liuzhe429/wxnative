@@ -23,6 +23,8 @@ import DealDetailScreen from './containers/DealDetail/DealDetailScreen'
 import SxyDetailScreen from './containers/SxyDetail/SxyDetailScreen'
 import DealConfirmScreen from './containers/DealConfirm/DealConfirmScreen'
 global.store = store.getState()
+// global.originTarget = "https://mo.wangxinlicai.com"
+global.originTarget = "http://10.20.69.46:3030"
 // 通过TabNavigator做路由映射
 const MainScreentNavigator = TabNavigator({
   Home:{
@@ -133,8 +135,6 @@ const  MyNavigatior = StackNavigator({
 class App extends Component{
   
   render(){
-    console.log(store.getState())
-
     return <Provider store={store}>
               <MyNavigatior/>
            </Provider>

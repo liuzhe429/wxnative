@@ -68,7 +68,12 @@ export default class InvestItem extends Component {
             </View>
           : <View style={[itermStyles.itemRow]}>
               <Text style={{marginRight:5}}>{info.item.title}</Text>
-              <Text style={itermStyles.itemTag}>{info.item.deal_tag_name}</Text>
+              {
+                info.item.deal_tag_name
+                ? <Text style={itermStyles.itemTag}>{info.item.deal_tag_name}</Text>
+                : null
+              }
+              
             </View>
         }
         
@@ -92,7 +97,7 @@ export default class InvestItem extends Component {
               <Text style={{fontSize:15}}>{info.item.investUnit || info.item.timeunit}</Text>
             </Text>
           </View>
-          <View style={{flex:1}}>
+          <View style={{flex:1,marginBottom:10}}>
             <Text style={itermStyles.itemTitle}></Text>
             <View style={{justifyContent:"flex-end",alignItems:"center",marginRight:15}}>
               
@@ -112,11 +117,22 @@ export default class InvestItem extends Component {
         <View style={{marginTop:3,marginLeft:15,marginRight:15}}>
         <DashLine/>
         </View>
-        <View style={{flexDirection:"row",justifyContent:"space-between",marginLeft:15,marginRight:10,paddingTop:10,paddingBottom:15}}>
-          <Text style={itermStyles.itemDesc}>100.00元起投资</Text>
-          <Text style={itermStyles.itemDesc}>100.00元起投资</Text>
-          <Text style={itermStyles.itemDesc}>100.00元起投资</Text>
-        </View>
+        {
+          info.item.mini
+          ? <View style={{flexDirection:"row",justifyContent:"space-between",marginLeft:15,marginRight:10,paddingTop:10,paddingBottom:15}}>
+              <Text style={itermStyles.itemDesc}>{info.item.mini}元起投</Text>
+              {info.item.repayment
+              ? <Text style={itermStyles.itemDesc}>{info.item.repayment}</Text>
+              : null}
+              <Text style={itermStyles.itemDesc}>剩{info.item.avaliable}元</Text>
+            </View>
+          : <View style={{flexDirection:"row",justifyContent:"space-between",marginLeft:15,marginRight:10,paddingTop:10,paddingBottom:15}}>
+              <Text style={itermStyles.itemDesc}>100元起投</Text>
+              <Text style={itermStyles.itemDesc}>100.00元起投</Text>
+              <Text style={itermStyles.itemDesc}>100.00元起投</Text>
+            </View>
+        }
+        
       </View>
     </TouchableOpacity>
     );

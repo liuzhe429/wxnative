@@ -13,7 +13,7 @@ let ScreenWidth = Dimensions.get('window').width
 var ScreenHeight = Dimensions.get('window').height
 import DashLine from "../../components/common/DashLine"
 import InvestItem from "../../components/InvestItem"
-import{getZxDatas} from "./dealListReducer.js"
+import{ getZxListDatas } from "./dealListReducer.js"
 
 class DealListScreen extends Component {
   //接收上一个页面传过来的title显示出来
@@ -29,18 +29,7 @@ class DealListScreen extends Component {
     // console.log(this.props.navigation.state.params.title,"navigation.state.params.title")
   }
   componentWillMount(){
-    const {dispatch} = this.props
-    let params = this.props.navigation.state.params
-    if(params.key == "zx"){
-      fetch("http://10.20.69.46:3030/api/index/zxP2pindex?dealListType=zx&page=1")
-      .then((res)=>res.json())
-      .then((datas)=>{
-        dispatch(getZxDatas(datas.data))
-        this.setState({
-          zxdatas:this.props.zxdatas
-        })
-      })
-    }
+    
   }
 
   // 点击返回上一页方法
@@ -51,14 +40,21 @@ class DealListScreen extends Component {
   refreshing(){
     let timer = setTimeout(()=>{
                     clearTimeout(timer)
-                    console.log('刷新成功')
+                    console.log('刷新成功2')
                 },1500)
+    const {dispatch} = this.props
+    let params = this.props.navigation.state.params
+    if(params.key == "zx"){
+      fetch("http://10.20.69.46:3030/api/index/zxP2pindex?dealListType=zx&page=1")
+      .then((res)=>res.json())
+      .then((datas)=>{
+        dispatch(getZxListDatas(datas.data))
+        
+      })
+    }
   }
   _onload(){
-      let timer = setTimeout(()=>{
-                      clearTimeout(timer)
-                      console.log('加载成功')
-                  },1500)
+    
   }
   _extraUniqueKey(item ,index){
     return "index"+index+item
@@ -81,8 +77,17 @@ class DealListScreen extends Component {
       return <View style={{height:10,backgroundColor:'transparent'}}/>
   }
   componentDidMount(){
+    const {dispatch} = this.props
+    fetch("http://10.20.69.46:3030/api/index/zxP2pindex?dealListType=zx&page=1")
+    .then((res)=>res.json())
+    .then((datas)=>{
+      console.log(datas,"datas")
+      dispatch(getZxListDatas(datas.data))
+      
+      })
     setTimeout(()=>{
-      console.log(this.props.zxdatas,"this.props.zxdatas")
+      console.log(this.props.zxdatas,"this.props.zxdatas,list")
+      console.log(global.store)
     },10000)
   }
   render() {
@@ -113,7 +118,7 @@ class DealListScreen extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  let { dealListReducer } = state;
+  let { dealListReducer } = state
   return dealListReducer
 }
 

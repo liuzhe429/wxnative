@@ -1,6 +1,8 @@
 //action
 export const GET_ZX_DATAS = 'GET_ZX_DATAS'
 export const GET_SXY_DATAS = 'GET_SXY_DATAS'
+export const CLEAR_ZX_DATAS = 'CLEAR_ZX_DATAS'
+export const CLEAR_SXY_DATAS = 'CLEAR_SXY_DATAS'
 export function getZxDatas(zxdatas) {
   return {
     type: GET_ZX_DATAS,
@@ -13,6 +15,16 @@ export function getSxyDatas(sxydatas){
    type: GET_SXY_DATAS,
    sxydatas
  }
+}
+export function clearZxDatas(){
+  return {
+    type: CLEAR_ZX_DATAS
+  }
+}
+export function clearSxyDatas(){
+  return {
+    type: CLEAR_SXY_DATAS
+  }
 }
 let initDatas = {
   zxdatas:[],
@@ -32,6 +44,16 @@ export default(state, action) => {
       return {
         ...state,
         sxydatas: state.sxydatas.concat(action.sxydatas)
+      }
+    case CLEAR_ZX_DATAS:
+      return {
+        ...state,
+        zxdatas:[]
+      }
+    case CLEAR_SXY_DATAS:
+      return {
+        ...state,
+        sxydatas:[]
       }
     default:
       return state
