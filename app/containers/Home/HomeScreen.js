@@ -74,7 +74,8 @@ class HomeScreen extends Component {
     }
     fetch(global.originTarget+"/api/index/zxP2pindex?dealListType=zx&page=1",()=>{
       dispatch(clearZxDatas())
-    }).then((res)=>res.json())
+    })
+    .then((res)=>res.json())
     .then((datas)=>{
       dispatch(getZxDatas(datas.data.slice(0,2)))
     })
