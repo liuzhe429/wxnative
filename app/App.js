@@ -17,7 +17,7 @@ import {
 import HomeScreen from './containers/Home/HomeScreen'
 import FoundScreen from './containers/Found/FoundScreen'
 import MyScreen from './containers/My/MyScreen'
-import DealListScreen from './containers/DealList/DealListScreen'
+import DealListScreen from './containers/DealList/index'
 import SxyListScreen from './containers/SxyList/SxyListScreen'
 import DealDetailScreen from './containers/DealDetail/DealDetailScreen'
 import SxyDetailScreen from './containers/SxyDetail/SxyDetailScreen'
@@ -28,7 +28,7 @@ global.originTarget = "http://10.20.69.46:3030"
 // 通过TabNavigator做路由映射
 const MainScreentNavigator = TabNavigator({
   Home:{
-    screen:HomeScreen,
+    screen:DealListScreen,
     navigationOptions:{
       header:null,//隐藏头部导航
       headerTitle:'首页',

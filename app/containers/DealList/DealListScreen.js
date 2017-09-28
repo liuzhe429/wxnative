@@ -1,142 +1,189 @@
-import React, { Component } from 'react';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component,PureComponent } from 'react';
+import { connect } from 'react-redux'
 import {
+  AppRegistry,
   StyleSheet,
   Text,
   View,
-  ActivityIndicator,
-  ListView,
+  TouchableOpacity,
+  FlatList,
+  Animated,ScrollView,
+  ActivityIndicator
 } from 'react-native';
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+import{ getZxListDatas,clearZxListDatas } from "./dealListReducer.js"
+import InvestItem from "../../components/InvestItem"
+import  Dimensions from 'Dimensions'//获取屏幕的宽高
+let ScreenWidth = Dimensions.get('window').width
+var ScreenHeight = Dimensions.get('window').height
 
-import {PullList} from 'react-native-pull';
-
-export default class extends Component {
-
-	constructor(props) {
-        super(props);
-        this.dataSource = [{
-            id: 0,
-            title: `this is the first.`,
-        }];
-        this.state = {
-            list: (new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})).cloneWithRows(this.dataSource),
-        };
-        this.renderHeader = this.renderHeader.bind(this);
-        this.renderRow = this.renderRow.bind(this);
-        this.renderFooter = this.renderFooter.bind(this);
-        this.loadMore = this.loadMore.bind(this);
-        this.topIndicatorRender = this.topIndicatorRender.bind(this);
-        // this.loadMore();
+class DealListScreen extends PureComponent {
+  //接收上一个页面传过来的title显示出来
+  static navigationOptions = ({ navigation }) => ({
+    // title: navigation.state.params.title
+    title: "列表"
+  });
+  constructor(props) {
+    super(props)
+    this.state = {
+      navigate : this.props.navigation.navigate,
+      data :[],
+      refreshing:true
     }
+  }
+  // 点击返回上一页方法
+  backVC=()=>{
+    //返回首页方法
+    this.props.navigation.goBack();
+  }
+  refreshing(){
+    console.log('刷新成功')
 
-    onPullRelease(resolve) {
-		//do something
-		setTimeout(() => {
-            resolve();
-        }, 3000);
-    }
+    let timer =  setTimeout(()=>{
+                clearTimeout(timer)
+                this.setState({
+                  refreshing:false
+                })
+                console.log('刷新成功')
+            },1000)
+  }
+  _onload(){
+    
+      let timer =  setTimeout(()=>{
+          clearTimeout(timer)
+          let page = this.props.zxlistpage
+          // if(this.props.zxlistdatas.length>0){
+          //   let page = this.props.zxlistpage+1
+          //   this.loadData(page)
+          // }
+          console.log('加载成功',this.props)
+      },1500)
+  }
+  
+  _renderItem = (info) => {
+    return <InvestItem data={info} navigate={this.state.navigate}/>
+  }
+  _extraUniqueKey(item ,index){
+    return "index"+index+item
+  } 
+  componentDidMount(){
+    this.loadData()
+  }
+  loadData(page){
+    page = page || 1
+    const {dispatch} = this.props
+    fetch(global.originTarget+"/api/index/zxP2pindex?dealListType=zx&page="+page,()=>{
+      dispatch(clearZxListDatas())
+    })
+    .then((res)=>res.json())
+    .then((datas)=>{
+      setTimeout(()=>{
+        this.setState({
+          refreshing:false
+        })
+      },1000)
+      
+      dispatch(getZxListDatas(datas.data,page))
+    })
+  }
 
-	topIndicatorRender(pulling, pullok, pullrelease) {
-        const hide = {position: 'absolute', left: -10000};
-        const show = {position: 'relative', left: 0};
-        setTimeout(() => {
-            if (pulling) {
-                this.txtPulling && this.txtPulling.setNativeProps({style: show});
-                this.txtPullok && this.txtPullok.setNativeProps({style: hide});
-                this.txtPullrelease && this.txtPullrelease.setNativeProps({style: hide});
-            } else if (pullok) {
-                this.txtPulling && this.txtPulling.setNativeProps({style: hide});
-                this.txtPullok && this.txtPullok.setNativeProps({style: show});
-                this.txtPullrelease && this.txtPullrelease.setNativeProps({style: hide});
-            } else if (pullrelease) {
-                this.txtPulling && this.txtPulling.setNativeProps({style: hide});
-                this.txtPullok && this.txtPullok.setNativeProps({style: hide});
-                this.txtPullrelease && this.txtPullrelease.setNativeProps({style: show});
-            }
-        }, 1);
-		return (
-            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: 60}}>
-                <ActivityIndicator size="small" color="gray" />
-                <Text ref={(c) => {this.txtPulling = c;}}>当前PullList状态: pulling...</Text>
-                <Text ref={(c) => {this.txtPullok = c;}}>当前PullList状态: pullok......</Text>
-                <Text ref={(c) => {this.txtPullrelease = c;}}>当前PullList状态: pullrelease......</Text>
-    		</View>
-        );
-	}
+  _header = () => {
+      return <Text></Text>;
+  }
 
-    render() {
-        return (
-          <View style={styles.container}>
-              <PullList
-                  style={{}}
-                  onPullRelease={this.onPullRelease} topIndicatorRender={this.topIndicatorRender} topIndicatorHeight={60}
-                  renderHeader={this.renderHeader}
-                  dataSource={this.state.list}
-                  pageSize={5}
-                  initialListSize={5}
-                  renderRow={this.renderRow}
-                  onEndReached={this.loadMore}
-                  onEndReachedThreshold={60}
-                  renderFooter={this.renderFooter}
-                  />
-          </View>
-        );
-    }
+  _footer = () => {
+      return <Text></Text>;
+  }
 
-    renderHeader() {
-      return (
-          <View style={{height: 50, backgroundColor: '#eeeeee', alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontWeight: 'bold'}}>This is header</Text>
-          </View>
-      );
-    }
-
-    renderRow(item, sectionID, rowID, highlightRow) {
-      return (
-          <View style={{height: 50, backgroundColor: '#fafafa', alignItems: 'center', justifyContent: 'center'}}>
-              <Text>{item.title}</Text>
-          </View>
-      );
-    }
-
-    renderFooter() {
-      if(this.state.nomore) {
-          return null;
-      }
-      return (
-          <View style={{height: 100}}>
-              <ActivityIndicator />
-          </View>
-      );
-    }
-
-    loadMore() {
-        this.dataSource.push({
-            id: 0,
-            title: `begin to create data ...`,
-        });
-        for(var i = 0; i < 5; i++) {
-            this.dataSource.push({
-                id: i + 1,
-                title: `this is ${i}`,
-            })
-        }
-        this.dataSource.push({
-            id: 6,
-            title: `finish create data ...`,
-        });
-        setTimeout(() => {
-            this.setState({
-                list: this.state.list.cloneWithRows(this.dataSource)
-            });
-        }, 1000);
-    }
-
+  //每个标的的间隔
+  _separator = () => {
+      return <View style={{height:10,backgroundColor:'transparent'}}/>
+  }
+  //加载等待的view
+  renderLoadingView() {
+    return (
+        <View style={styles.container}>
+            <ActivityIndicator
+                animating={true}
+                style={[{height: 80}]}
+                color='red'
+                size="large"
+            />
+        </View>
+    );
+  }
+  //加载等待的view
+  renderLoadedView() {
+    return (
+      <ScrollView>
+        <AnimatedFlatList
+          data={this.props.zxlistdatas}
+          keyExtractor = {this._extraUniqueKey}
+          ref={(flatList)=>this._flatList = flatList}
+          ListHeaderComponent={this._header}
+          ListFooterComponent={this._footer}
+          ItemSeparatorComponent={this._separator}
+          renderItem={this._renderItem}
+          refreshing={this.state.refreshing}
+          onRefresh={this.refreshing.bind(this)}
+          onEndReachedThreshold={0.2}
+          initialNumToRender={5}
+          onEndReached={(info)=>{
+            this._onload()
+          }}
+          numColumns ={1}
+          
+        />
+      </ScrollView>
+    );
+}
+  render() {
+    return (
+      <ScrollView>
+        <AnimatedFlatList
+          data={this.props.zxlistdatas}
+          keyExtractor = {this._extraUniqueKey}
+          ref={(flatList)=>this._flatList = flatList}
+          ListHeaderComponent={this._header}
+          ListFooterComponent={this._footer}
+          ItemSeparatorComponent={this._separator}
+          renderItem={this._renderItem}
+          refreshing={this.state.refreshing}
+          onRefresh={this.refreshing.bind(this)}
+          onEndReachedThreshold={100}
+          onEndReached={(info)=>{
+            this._onload()
+          }}
+          numColumns ={1}
+          getItemLayout={(data,index)=>(
+            {length: 100, offset: (100+2) * index, index}
+          )}
+        />
+      </ScrollView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#F5F5FA',
   },
+  spindicator: {
+    marginLeft: 10,
+    width: 2,
+    height: 16,
+    backgroundColor: '#FFB8C6',
+  }
 });
+const mapStateToProps = (state) => {
+  let { dealListReducer } = state
+  return dealListReducer
+}
+export default connect(mapStateToProps)(DealListScreen)

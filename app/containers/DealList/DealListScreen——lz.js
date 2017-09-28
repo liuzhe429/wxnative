@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component,PureComponent } from 'react'
 import { connect } from 'react-redux'
 import {
   AppRegistry,
@@ -6,25 +6,25 @@ import {
   Text,
   View,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Animated,
+  ActivityIndicator
 } from 'react-native'
-import  Dimensions from 'Dimensions'//获取屏幕的宽高
-let ScreenWidth = Dimensions.get('window').width
-var ScreenHeight = Dimensions.get('window').height
-import DashLine from "../../components/common/DashLine"
+import {PullList} from '../../components/common/react-native-pull-lz';
 import InvestItem from "../../components/InvestItem"
 import{ getZxListDatas,clearZxListDatas } from "./dealListReducer.js"
 
-class DealListScreen extends Component {
+class DealListScreen extends PureComponent {
   //接收上一个页面传过来的title显示出来
   static navigationOptions = ({ navigation }) => ({
-    title: navigation.state.params.title
+    // title: navigation.state.params.title
   })
   constructor(props) {
     super(props)
     this.state = {
-      navigate : this.props.navigation.navigate,
-      data :[]
+      // navigate : this.props.navigation.navigate,
+      data :[],
+      isLoading:true
     }
   }
   componentWillMount(){
@@ -34,7 +34,7 @@ class DealListScreen extends Component {
   // 点击返回上一页方法
   backVC=()=>{
     //返回首页方法
-    this.props.navigation.goBack()
+    // this.props.navigation.goBack()
   }
   refreshing(){
     const { dispatch } = this.props
@@ -82,6 +82,12 @@ class DealListScreen extends Component {
     })
     .then((res)=>res.json())
     .then((datas)=>{
+      setTimeout(()=>{
+        this.setState({
+          isLoading:false
+        })
+      },3000)
+      
       dispatch(getZxListDatas(datas.data))
     })
   }
@@ -90,11 +96,14 @@ class DealListScreen extends Component {
     if(this.props.zxlistdatas.length>0) return
     this.loadData()
   }
+  
   render() {
-    const { navigate } = this.props.navigation
+    console.log("zxlistdatas",this.props.zxlistdatas)
+    // const { navigate } = this.props.navigation
     return (
         <View>
-          <FlatList
+          
+          <PullList
             data={this.props.zxlistdatas}
             keyExtractor = {this._extraUniqueKey}
             ref={(flatList)=>this._flatList = flatList}
@@ -102,14 +111,11 @@ class DealListScreen extends Component {
             ListFooterComponent={this._footer}
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
-            onRefresh={this.refreshing.bind(this)}
             refreshing={false}
-            onEndReachedThreshold={0}
+            onRefresh={this.refreshing.bind(this)}
+            onEndReachedThreshold={0.3}
             onEndReached={this._onload.bind(this)}
             numColumns ={1}
-            getItemLayout={(data,index)=>(
-              {length: 100, offset: (100+2) * index, index}
-            )}
           />
         </View>
     )
@@ -119,5 +125,12 @@ const mapStateToProps = (state) => {
   let { dealListReducer } = state
   return dealListReducer
 }
-
+const styles = StyleSheet.create({
+  spindicator: {
+    marginLeft: 10,
+    width: 2,
+    height: 16,
+    backgroundColor: '#FFB8C6',
+  }
+})
 export default connect(mapStateToProps)(DealListScreen)
